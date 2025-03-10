@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myapplication6.R
 //import io.ktor.client.*
 
 //import io.ktor.client.request.*
@@ -32,7 +31,6 @@ import retrofit2.http.Query
 // Data classes
 data class TopLevelTile(val title: String)
 data class MiddleLevelTile(val title: String, val topLevelIndex: Int)
-data class BottomLevelTile(val title: String, val content: String)
 
 // Quote API data classes
 data class QuoteResponse(
