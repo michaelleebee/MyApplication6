@@ -29,9 +29,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import androidx.compose.foundation.layout.*
-
-
+import missing.namespace.R
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -44,16 +42,12 @@ class MainActivity : ComponentActivity() {
             TileApp()
         }
 
-
-            ActivityCompat.requestPermissions(this, arrayOf(
-                Manifest.permission.CHANGE_WIFI_STATE,
-                Manifest.permission.ACCESS_WIFI_STATE
-            ), REQUEST_CODE_WIFI_PERMISSIONS)
-        }
+        ActivityCompat.requestPermissions(this, arrayOf(
+            Manifest.permission.CHANGE_WIFI_STATE,
+            Manifest.permission.ACCESS_WIFI_STATE
+        ), REQUEST_CODE_WIFI_PERMISSIONS)
     }
-
-    // Handle the result of the permission request
-
+}
 
 @Composable
 fun TileButton(
@@ -72,17 +66,6 @@ fun TileButton(
         Text(text = text, fontSize = fontSize)
     }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 sealed class Screen(val route: String) {
     object TopLevel : Screen("top_level")
@@ -134,8 +117,6 @@ fun TileApp() {
         var quoteContent by remember { mutableStateOf("Loading quote...") }
         var quoteAuthor by remember { mutableStateOf("") }
 
-
-
         val coroutineScope = rememberCoroutineScope()
 
         val fetchQuote: (String) -> Unit = { keyword ->
@@ -158,161 +139,17 @@ fun TileApp() {
     }
 }
 
-
-
-
-
 @Composable
 fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String) -> Unit) {
     val navController = rememberNavController()
     NavHost(navController, startDestination = Screen.TopLevel.route) {
         composable(Screen.TopLevel.route) {
-            @Composable
-            fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        "Inspiration: Home",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(0.4f)
-                            .padding(8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.your_resized_elephant_image),
-                            contentDescription = "Top Level Image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Do not dwell in the past, do not dream of the future,",
-                            fontSize = 32.sp
-                        )
-                        Text(
-                            text = "concentrate the mind on the present moment.",
-                            fontSize = 32.sp
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(0.4f)
-                            .fillMaxHeight(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        tiles.forEachIndexed { index, tile ->
-                            TileButton(text = tile.title, onClick = { onTileClick(index) })
-                        }
-                    }
-                }
-            }
             TopLevelScreen(tiles = topLevelTiles, onTileClick = { index ->
                 val theme = topLevelTiles[index].title
                 Log.d("AppNavigation", "Navigating to MiddleLevel with theme: $theme")
                 navController.navigate(Screen.MiddleLevel.createRoute(theme))
             })
         }
-
-        @Composable
-        fun MiddleLevelScreen(
-            tiles: List<MiddleLevelTile>,
-            onTileClick: (Int) -> Unit,
-            onBack: () -> Unit
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Middle Level - Top Level Index: ${tiles.first().topLevelIndex + 1}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-
-                tiles.forEachIndexed { index, tile ->
-                    TileButton(
-                        text = tile.title,
-                        onClick = { onTileClick(tile.topLevelIndex * 3 + index) })
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-
-                Button(onClick = onBack) {
-                    Text("Back to Inspiration: Home")
-                }
-            }
-        }
-
-        @Composable
-        fun BottomLevelScreen(
-            topLevelIndex: Int,
-            middleLevelIndex: Int,
-            quoteContent: String,
-            quoteAuthor: String,
-            onBack: () -> Unit
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    "Bottom Level - Top: ${topLevelIndex + 1}, Middle: ${middleLevelIndex + 1}",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = quoteContent,
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        if (quoteAuthor.isNotEmpty()) {
-                            Text(
-                                text = "— $quoteAuthor",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.End)
-                            )
-                        }
-                    }
-                }
-
-                Button(
-                    onClick = onBack,
-                    modifier = Modifier.padding(top = 24.dp)
-                ) {
-                    Text("Back to Middle Level")
-                }
-            }
-        }
-
         composable(Screen.MiddleLevel.route) { backStackEntry ->
             val theme = backStackEntry.arguments?.getString("theme")
             if (theme != null) {
@@ -335,10 +172,7 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
             val theme = backStackEntry.arguments?.getString("theme")
             val aspect = backStackEntry.arguments?.getString("aspect")
             if (theme != null && aspect != null) {
-                Log.d(
-                    "AppNavigation",
-                    "Navigated to BottomLevel with theme: $theme and aspect: $aspect"
-                )
+                Log.d("AppNavigation", "Navigated to BottomLevel with theme: $theme and aspect: $aspect")
                 BottomLevelScreen(
                     topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme },
                     middleLevelIndex = middleLevelTiles.indexOfFirst { it.title == aspect },
@@ -348,14 +182,129 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
                 )
             } else {
                 Log.e("AppNavigation", "Theme or aspect argument is missing")
+            }
+        }
+    }
+}
 
-                BottomLevelScreen(
-                    topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme },
-                    middleLevelIndex = middleLevelTiles.indexOfFirst { it.title == aspect },
-                    quoteContent = quoteContent,
-                    quoteAuthor = quoteAuthor,
-                    onBack = { navController.popBackStack() }
-                )
+@Composable
+fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "Inspiration: Home",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.4f)
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.your_resized_elephant_image),
+                contentDescription = "Top Level Image",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Do not dwell in the past, do not dream of the future,",
+                fontSize = 32.sp
+            )
+            Text(
+                text = "concentrate the mind on the present moment.",
+                fontSize = 32.sp
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(0.4f)
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            tiles.forEachIndexed { index, tile ->
+                TileButton(text = tile.title, onClick = { onTileClick(index) })
+            }
+        }
+    }
+}
+
+@Composable
+fun MiddleLevelScreen(
+    tiles: List<MiddleLevelTile>,
+    onTileClick: (Int) -> Unit,
+    onBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "Middle Level - Top Level Index: ${tiles.first().topLevelIndex + 1}",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(16.dp)
+        )
+
+        tiles.forEachIndexed { index, tile ->
+            TileButton(
+                text = tile.title,
+                onClick = { onTileClick(tile.topLevelIndex * 3 + index) })
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Button(onClick = onBack) {
+            Text("Back to Inspiration: Home")
+        }
+    }
+}
+
+@Composable
+fun BottomLevelScreen(
+    topLevelIndex: Int,
+    middleLevelIndex: Int,
+    quoteContent: String,
+    quoteAuthor: String,
+    onBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            "Bottom Level - Top: ${topLevelIndex + 1}, Middle: ${middleLevelIndex + 1}",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = quoteContent,
                     style = MaterialTheme.typography.bodyLarge,
@@ -369,182 +318,27 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
                     )
                 }
             }
-
         }
-    }
 
-    @Composable
-    fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                "Inspiration: Home",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.4f)
-                    .padding(8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.your_resized_elephant_image),
-                    contentDescription = "Top Level Image",
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Do not dwell in the past, do not dream of the future,",
-                    fontSize = 32.sp
-                )
-                Text(
-                    text = "concentrate the mind on the present moment.",
-                    fontSize = 32.sp
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(0.4f)
-                    .fillMaxHeight(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                tiles.forEachIndexed { index, tile ->
-                    TileButton(text = tile.title, onClick = { onTileClick(index) })
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun MiddleLevelScreen(
-        tiles: List<MiddleLevelTile>,
-        onTileClick: (Int) -> Unit,
-        onBack: () -> Unit
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                "Middle Level - Top Level Index: ${tiles.first().topLevelIndex + 1}",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            tiles.forEachIndexed { index, tile ->
-                TileButton(
-                    text = tile.title,
-                    onClick = { onTileClick(tile.topLevelIndex * 3 + index) })
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            Button(onClick = onBack) {
-                Text("Back to Inspiration: Home")
-            }
-        }
-    }
-
-    @Composable
-    fun BottomLevelScreen(
-        topLevelIndex: Int,
-        middleLevelIndex: Int,
-        quoteContent: String,
-        quoteAuthor: String,
-        onBack: () -> Unit
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                "Bottom Level - Top: ${topLevelIndex + 1}, Middle: ${middleLevelIndex + 1}",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = quoteContent,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    if (quoteAuthor.isNotEmpty()) {
-                        Text(
-                            text = "— $quoteAuthor",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.align(Alignment.End)
-                        )
-                    }
-                }
-            }
-
-            Button(
-                onClick = onBack,
-                modifier = Modifier.padding(top = 24.dp)
-            ) {
-                Text("Back to Middle Level")
-            }
-        }
-    }
-
-    @Composable
-    fun TileButton(
-        text: String,
-        onClick: () -> Unit,
-        fontSize: TextUnit = 20.sp,
-        tileColor: Color = MaterialTheme.colorScheme.primary
-    ) {
         Button(
-            onClick = onClick,
-            modifier = Modifier
-                .width(260.dp)
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = tileColor)
+            onClick = onBack,
+            modifier = Modifier.padding(top = 24.dp)
         ) {
-            Text(text = text, fontSize = fontSize)
-        }
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .align(Alignment.CenterHorizontally)
-    ) {
-        // Your content here
-
-
-        @Composable
-        fun TileButtonPreview() {
-            MaterialTheme {
-                TileButton(text = "Test Button", onClick = {})
-            }
+            Text("Back to Middle Level")
         }
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    TileApp()
+}
 
+@Preview
+@Composable
+fun TileButtonPreview() {
+    MaterialTheme {
+        TileButton(text = "Test Button", onClick = {})
+    }
+}
