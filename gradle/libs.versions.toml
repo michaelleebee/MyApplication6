@@ -1,4 +1,5 @@
 [versions]
+activityComposeVersion = "1.7.2"
 agp = "8.9.0"
 converterGson = "2.9.0"
 kotlin = "2.0.21"
@@ -19,6 +20,7 @@ supportAnnotations = "28.0.0"
 navigationCompose = "2.8.8"
 
 [libraries]
+androidx-activity-compose-v172 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
