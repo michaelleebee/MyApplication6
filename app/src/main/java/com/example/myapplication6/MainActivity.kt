@@ -64,6 +64,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
+
 @Composable
 fun TileButton(
     text: String,
@@ -126,6 +129,7 @@ val retrofit = Retrofit.Builder()
 
 val quotableService = retrofit.create(QuotableService::class.java)
 
+
 @Composable
 fun TileApp() {
     MaterialTheme {
@@ -135,6 +139,7 @@ fun TileApp() {
         val coroutineScope = rememberCoroutineScope()
 
         val fetchQuote: (String) -> Unit = { keyword ->
+            Log.d("TileApp", "fetchQuote function called with keyword: $keyword")
             coroutineScope.launch {
                 try {
                     Log.d("TileApp", "Fetching quote for keyword: $keyword")
@@ -153,6 +158,7 @@ fun TileApp() {
         AppNavigation(quoteContent, quoteAuthor, fetchQuote)
     }
 }
+
 
 @Composable
 fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String) -> Unit) {
@@ -202,12 +208,15 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
     }
 }
 
+
 @Composable
 fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             "Inspiration: Home",
@@ -218,7 +227,7 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.4f)
+                .weight(1f)
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -248,10 +257,10 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
 
         Column(
             modifier = Modifier
-                .weight(0.4f)
-                .fillMaxHeight(),
+                .fillMaxWidth()
+                .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             tiles.forEachIndexed { index, tile ->
                 TileButton(text = tile.title, onClick = { onTileClick(index) })
@@ -259,7 +268,6 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
         }
     }
 }
-
 @Composable
 fun MiddleLevelScreen(
     tiles: List<MiddleLevelTile>,
