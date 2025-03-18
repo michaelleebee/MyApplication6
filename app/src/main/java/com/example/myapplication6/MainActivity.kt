@@ -6,27 +6,9 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,11 +22,69 @@ import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 import retrofit2.http.Query
+import retrofit2.Response
+import retrofit2.http.GET
+
+sealed class Screen(val route: String) {
+    object TopLevel : Screen("top_level")
+    object MiddleLevel : Screen("middle_level/{theme}") {
+        fun createRoute(theme: String) = "middle_level/$theme"
+    }
+    object BottomLevel : Screen("bottom_level/{theme}/{aspect}") {
+        fun createRoute(theme: String, aspect: String) = "bottom_level/$theme/$aspect"
+    }
+}
+
+data class Quote(
+    val id: Int,
+    val advice: String
+)
+
+interface QuoteService {
+    @GET("advice")
+    suspend fun getQuote(): Response<Quote>
+}
+
+interface QuotableService {
+    @GET("random")
+    suspend fun getRandomQuote(@Query("tags") tags: String): QuoteResponse
+}
+
+data class ErrorResponse(val message: String)
+data class TopLevelTile(val title: String)
+data class MiddleLevelTile(val title: String, val topLevelIndex: Int)
+data class Slip(
+    val id: Int,
+    val advice: String
+)
+
+data class QuoteResponse(
+    val slip: Slip
+)
+
+val retrofit = Retrofit.Builder()
+    .baseUrl("https://api.adviceslip.com/")
+    .addConverterFactory(GsonConverterFactory.create())
+    .build()
+
+val quotableService: QuotableService = retrofit.create(QuotableService::class.java)
+
+val topLevelTiles: List<TopLevelTile> = listOf(
+    TopLevelTile("Peace"),
+    TopLevelTile("Love"),
+    TopLevelTile("Happiness")
+)
+
+val middleLevelTiles: List<MiddleLevelTile> = listOf(
+    MiddleLevelTile("Inspiration Love", 0),
+    MiddleLevelTile("Inspiration Now", 1),
+    MiddleLevelTile("Inspiration First", 2)
+)
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -57,15 +97,86 @@ class MainActivity : ComponentActivity() {
             TileApp()
         }
 
-        ActivityCompat.requestPermissions(this, arrayOf(
-            Manifest.permission.CHANGE_WIFI_STATE,
-            Manifest.permission.ACCESS_WIFI_STATE
-        ), REQUEST_CODE_WIFI_PERMISSIONS)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.CHANGE_WIFI_STATE,
+                Manifest.permission.ACCESS_WIFI_STATE
+            ),
+            REQUEST_CODE_WIFI_PERMISSIONS
+        )
     }
 }
 
+@Composable
+fun TileApp() {
+    MaterialTheme {
+        var quoteContent by remember { mutableStateOf("Loading quote...") }
+        var quoteAuthor by remember { mutableStateOf("") }
 
+        val coroutineScope = rememberCoroutineScope()
 
+        val fetchQuote: (String) -> Unit = { keyword ->
+            Log.d("TileApp", "fetchQuote function called with keyword: $keyword")
+            coroutineScope.launch {
+                try {
+                    val url = "https://api.adviceslip.com/advice/search/$keyword"
+                    Log.d("TileApp", "Fetching quote from URL: $url")
+                    val response = quotableService.getRandomQuote(keyword.lowercase())
+                    quoteContent = response.slip.advice
+                    quoteAuthor = "Unknown" // Since the API does not provide an author
+                    Log.d("TileApp", "Quote fetched: $quoteContent")
+                } catch (e: Exception) {
+                    Log.e("TileApp", "Error fetching quote: ${e.message}")
+                    quoteContent = "Could not load a quote about $keyword. Please try again."
+                    quoteAuthor = ""
+                }
+            }
+        }
+
+        AppNavigation(quoteContent, quoteAuthor, fetchQuote)
+    }
+}
+
+@Composable
+fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String) -> Unit) {
+    val navController = rememberNavController()
+    NavHost(navController, startDestination = Screen.TopLevel.route) {
+        composable(Screen.TopLevel.route) {
+            TopLevelScreen(tiles = topLevelTiles, onTileClick = { index ->
+                val theme = topLevelTiles[index].title
+                navController.navigate(Screen.MiddleLevel.createRoute(theme))
+            })
+        }
+        composable(Screen.MiddleLevel.route) { backStackEntry ->
+            val theme = backStackEntry.arguments?.getString("theme")
+            if (theme != null) {
+                MiddleLevelScreen(
+                    tiles = middleLevelTiles.filter { it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme } },
+                    onTileClick = { index ->
+                        val aspect = middleLevelTiles[index].title
+                        fetchQuote(aspect)
+                        navController.navigate(Screen.BottomLevel.createRoute(theme, aspect))
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+        }
+        composable(Screen.BottomLevel.route) { backStackEntry ->
+            val theme = backStackEntry.arguments?.getString("theme")
+            val aspect = backStackEntry.arguments?.getString("aspect")
+            if (theme != null && aspect != null) {
+                BottomLevelScreen(
+                    topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme },
+                    middleLevelIndex = middleLevelTiles.indexOfFirst { it.title == aspect },
+                    quoteContent = quoteContent,
+                    quoteAuthor = quoteAuthor,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun TileButton(
@@ -84,130 +195,6 @@ fun TileButton(
         Text(text = text, fontSize = fontSize)
     }
 }
-
-sealed class Screen(val route: String) {
-    object TopLevel : Screen("top_level")
-    object MiddleLevel : Screen("middle_level/{theme}") {
-        fun createRoute(theme: String) = "middle_level/$theme"
-    }
-    object BottomLevel : Screen("bottom_level/{theme}/{aspect}") {
-        fun createRoute(theme: String, aspect: String) = "bottom_level/$theme/$aspect"
-    }
-}
-
-data class TopLevelTile(val title: String)
-data class MiddleLevelTile(val title: String, val topLevelIndex: Int)
-data class QuoteResponse(val content: String, val author: String)
-
-interface QuotableService {
-    @GET("random")
-    suspend fun getRandomQuote(@Query("tags") tags: String): QuoteResponse
-}
-
-val topLevelTiles: List<TopLevelTile> = listOf(
-    TopLevelTile("Peace"),
-    TopLevelTile("Love"),
-    TopLevelTile("Happiness")
-)
-
-val middleLevelTiles: List<MiddleLevelTile> = listOf(
-    MiddleLevelTile("Inspiration Love", 0),
-    MiddleLevelTile("Inspiration Peace", 0),
-    MiddleLevelTile("Inspiration Happiness", 0),
-    MiddleLevelTile("Inspiration Now", 1),
-    MiddleLevelTile("Inspiration Yesterday", 1),
-    MiddleLevelTile("Inspiration Tomorrow", 1),
-    MiddleLevelTile("Inspiration First", 2),
-    MiddleLevelTile("Inspiration Next", 2),
-    MiddleLevelTile("Inspiration Last", 2)
-)
-
-val retrofit = Retrofit.Builder()
-    .baseUrl("https://api.quotable.io/")
-    .addConverterFactory(GsonConverterFactory.create())
-    .build()
-
-val quotableService = retrofit.create(QuotableService::class.java)
-
-
-@Composable
-fun TileApp() {
-    MaterialTheme {
-        var quoteContent by remember { mutableStateOf("Loading quote...") }
-        var quoteAuthor by remember { mutableStateOf("") }
-
-        val coroutineScope = rememberCoroutineScope()
-
-        val fetchQuote: (String) -> Unit = { keyword ->
-            Log.d("TileApp", "fetchQuote function called with keyword: $keyword")
-            coroutineScope.launch {
-                try {
-                    Log.d("TileApp", "Fetching quote for keyword: $keyword")
-                    val response = quotableService.getRandomQuote(keyword.lowercase())
-                    quoteContent = response.content
-                    quoteAuthor = response.author
-                    Log.d("TileApp", "Quote fetched: $quoteContent by $quoteAuthor")
-                } catch (e: Exception) {
-                    Log.e("TileApp", "Error fetching quote: ${e.message}")
-                    quoteContent = "Could not load a quote about $keyword. Please try again."
-                    quoteAuthor = ""
-                }
-            }
-        }
-
-        AppNavigation(quoteContent, quoteAuthor, fetchQuote)
-    }
-}
-
-
-@Composable
-fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String) -> Unit) {
-    val navController = rememberNavController()
-    NavHost(navController, startDestination = Screen.TopLevel.route) {
-        composable(Screen.TopLevel.route) {
-            TopLevelScreen(tiles = topLevelTiles, onTileClick = { index ->
-                val theme = topLevelTiles[index].title
-                Log.d("AppNavigation", "Navigating to MiddleLevel with theme: $theme")
-                navController.navigate(Screen.MiddleLevel.createRoute(theme))
-            })
-        }
-        composable(Screen.MiddleLevel.route) { backStackEntry ->
-            val theme = backStackEntry.arguments?.getString("theme")
-            if (theme != null) {
-                Log.d("AppNavigation", "Navigated to MiddleLevel with theme: $theme")
-                MiddleLevelScreen(
-                    tiles = middleLevelTiles.filter { it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme } },
-                    onTileClick = { index ->
-                        val aspect = middleLevelTiles[index].title
-                        Log.d("AppNavigation", "Fetching quote for aspect: $aspect")
-                        fetchQuote(aspect)
-                        navController.navigate(Screen.BottomLevel.createRoute(theme, aspect))
-                    },
-                    onBack = { navController.popBackStack() }
-                )
-            } else {
-                Log.e("AppNavigation", "Theme argument is missing")
-            }
-        }
-        composable(Screen.BottomLevel.route) { backStackEntry ->
-            val theme = backStackEntry.arguments?.getString("theme")
-            val aspect = backStackEntry.arguments?.getString("aspect")
-            if (theme != null && aspect != null) {
-                Log.d("AppNavigation", "Navigated to BottomLevel with theme: $theme and aspect: $aspect")
-                BottomLevelScreen(
-                    topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme },
-                    middleLevelIndex = middleLevelTiles.indexOfFirst { it.title == aspect },
-                    quoteContent = quoteContent,
-                    quoteAuthor = quoteAuthor,
-                    onBack = { navController.popBackStack() }
-                )
-            } else {
-                Log.e("AppNavigation", "Theme or aspect argument is missing")
-            }
-        }
-    }
-}
-
 
 @Composable
 fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
@@ -268,6 +255,7 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
         }
     }
 }
+
 @Composable
 fun MiddleLevelScreen(
     tiles: List<MiddleLevelTile>,
@@ -288,7 +276,7 @@ fun MiddleLevelScreen(
         tiles.forEachIndexed { index, tile ->
             TileButton(
                 text = tile.title,
-                onClick = { onTileClick(tile.topLevelIndex * 3 + index) })
+                onClick = { onTileClick(index) })
             Spacer(modifier = Modifier.height(8.dp))
         }
 
