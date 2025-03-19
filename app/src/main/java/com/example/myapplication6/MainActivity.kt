@@ -29,6 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Query
 import retrofit2.Response
 import retrofit2.http.GET
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 
 sealed class Screen(val route: String) {
     object TopLevel : Screen("top_level")
@@ -120,9 +123,10 @@ fun TileApp() {
             Log.d("TileApp", "fetchQuote function called with keyword: $keyword")
             coroutineScope.launch {
                 try {
-                    val url = "https://api.adviceslip.com/advice/search/$keyword"
+                    val encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString())
+                    val url = "https://api.adviceslip.com/advice/search/$encodedKeyword"
                     Log.d("TileApp", "Fetching quote from URL: $url")
-                    val response = quotableService.getRandomQuote(keyword.lowercase())
+                    val response = quotableService.getRandomQuote(encodedKeyword.lowercase())
                     quoteContent = response.slip.advice
                     quoteAuthor = "Unknown" // Since the API does not provide an author
                     Log.d("TileApp", "Quote fetched: $quoteContent")
