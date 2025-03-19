@@ -29,9 +29,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Query
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-
 
 sealed class Screen(val route: String) {
     object TopLevel : Screen("top_level")
@@ -53,9 +53,9 @@ interface QuoteService {
     suspend fun getQuote(): Response<Quote>
 }
 
-interface QuotableService {
-    @GET("random")
-    suspend fun getRandomQuote(@Query("tags") tags: String): QuoteResponse
+interface AdviceService {
+    @GET("advice/search/{keyword}")
+    suspend fun searchAdvice(@Path("keyword") keyword: String): Response<AdviceResponse>
 }
 
 data class ErrorResponse(val message: String)
@@ -67,7 +67,31 @@ data class Slip(
 )
 
 data class QuoteResponse(
-    val slip: Slip
+    val slip: Slip?
+)
+
+data class AdviceResponse(
+    val slips: List<Slip>?,
+    val message: Message?
+)
+
+data class Message(
+    val text: String
+)
+
+val topLevelTiles = listOf(
+    TopLevelTile("Inspiration"),
+    TopLevelTile("Motivation"),
+    TopLevelTile("Happiness")
+)
+
+val middleLevelTiles = listOf(
+    MiddleLevelTile("Love", 0),
+    MiddleLevelTile("Life", 0),
+    MiddleLevelTile("Success", 1),
+    MiddleLevelTile("Goals", 1),
+    MiddleLevelTile("Joy", 2),
+    MiddleLevelTile("Peace", 2)
 )
 
 val retrofit = Retrofit.Builder()
@@ -75,19 +99,7 @@ val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-val quotableService: QuotableService = retrofit.create(QuotableService::class.java)
-
-val topLevelTiles: List<TopLevelTile> = listOf(
-    TopLevelTile("Peace"),
-    TopLevelTile("Love"),
-    TopLevelTile("Happiness")
-)
-
-val middleLevelTiles: List<MiddleLevelTile> = listOf(
-    MiddleLevelTile("Inspiration Love", 0),
-    MiddleLevelTile("Inspiration Now", 1),
-    MiddleLevelTile("Inspiration First", 2)
-)
+val adviceService: AdviceService = retrofit.create(AdviceService::class.java)
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -119,26 +131,38 @@ fun TileApp() {
 
         val coroutineScope = rememberCoroutineScope()
 
-        val fetchQuote: (String) -> Unit = { keyword ->
-            Log.d("TileApp", "fetchQuote function called with keyword: $keyword")
+        val fetchAdvice: (String) -> Unit = { keyword ->
+            val encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString())
             coroutineScope.launch {
                 try {
-                    val encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString())
-                    val url = "https://api.adviceslip.com/advice/search/$encodedKeyword"
-                    Log.d("TileApp", "Fetching quote from URL: $url")
-                    val response = quotableService.getRandomQuote(encodedKeyword.lowercase())
-                    quoteContent = response.slip.advice
-                    quoteAuthor = "Unknown" // Since the API does not provide an author
-                    Log.d("TileApp", "Quote fetched: $quoteContent")
+                    val response = adviceService.searchAdvice(encodedKeyword)
+                    if (response.isSuccessful) {
+                        val adviceResponse = response.body()
+                        if (adviceResponse != null) {
+                            adviceResponse.message?.let {
+                                quoteContent = it.text
+                                quoteAuthor = ""
+                            }
+                            adviceResponse.slips?.forEach { slip ->
+                                quoteContent = slip.advice
+                                quoteAuthor = "Unknown"
+                            }
+                        } else {
+                            quoteContent = "Unexpected response from API."
+                            quoteAuthor = ""
+                        }
+                    } else {
+                        throw Exception("HTTP ${response.code()}")
+                    }
                 } catch (e: Exception) {
-                    Log.e("TileApp", "Error fetching quote: ${e.message}")
-                    quoteContent = "Could not load a quote about $keyword. Please try again."
+                    Log.e("TileApp", "Error: ${e.message}")
+                    quoteContent = "Error: ${e.message}"
                     quoteAuthor = ""
                 }
             }
         }
 
-        AppNavigation(quoteContent, quoteAuthor, fetchQuote)
+        AppNavigation(quoteContent, quoteAuthor, fetchAdvice)
     }
 }
 
