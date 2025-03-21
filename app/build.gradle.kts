@@ -73,6 +73,11 @@ dependencies {
     implementation(libs.support.annotations)
     implementation(libs.androidx.navigation.compose)
 
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
