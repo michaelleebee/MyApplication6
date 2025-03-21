@@ -32,6 +32,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import kotlin.random.Random
 
 sealed class Screen(val route: String) {
     object TopLevel : Screen("top_level")
@@ -78,6 +79,47 @@ data class AdviceResponse(
 data class Message(
     val text: String
 )
+
+// Object to store and manage quotes to avoid repetition
+object QuoteManager {
+    // Map to store used quotes for each keyword
+    private val usedQuotesMap = mutableMapOf<String, MutableSet<Int>>()
+
+    // Function to get a non-repeating quote
+    fun getUniqueQuote(keyword: String, quotes: List<Slip>): Slip? {
+        if (quotes.isEmpty()) return null
+
+        // Initialize the set of used quotes for this keyword if not already present
+        if (!usedQuotesMap.containsKey(keyword)) {
+            usedQuotesMap[keyword] = mutableSetOf()
+        }
+
+        val usedQuotes = usedQuotesMap[keyword]!!
+
+        // If all quotes have been used, reset the set
+        if (usedQuotes.size >= quotes.size) {
+            usedQuotes.clear()
+        }
+
+        // Find quotes that haven't been used yet
+        val availableQuotes = quotes.filter { it.id !in usedQuotes }
+
+        // If no quotes are available (should never happen due to the reset above)
+        if (availableQuotes.isEmpty()) {
+            // Reset and try again with all quotes
+            usedQuotes.clear()
+            return quotes.random().also { usedQuotes.add(it.id) }
+        }
+
+        // Get a random quote from available ones
+        val selectedQuote = availableQuotes.random()
+
+        // Mark this quote as used
+        usedQuotes.add(selectedQuote.id)
+
+        return selectedQuote
+    }
+}
 
 val topLevelTiles = listOf(
     TopLevelTile("Inspiration"),
@@ -139,14 +181,35 @@ fun TileApp() {
                     if (response.isSuccessful) {
                         val adviceResponse = response.body()
                         if (adviceResponse != null) {
+                            // Handle the case when message is provided
                             adviceResponse.message?.let {
                                 quoteContent = it.text
                                 quoteAuthor = ""
+                                return@launch
                             }
-                            adviceResponse.slips?.forEach { slip ->
-                                quoteContent = slip.advice
-                                quoteAuthor = "Unknown"
+
+                            // Handle slips when they exist
+                            adviceResponse.slips?.let { slips ->
+                                if (slips.isNotEmpty()) {
+                                    // Get a unique, non-repeating quote
+                                    val uniqueQuote = QuoteManager.getUniqueQuote(keyword, slips)
+                                    if (uniqueQuote != null) {
+                                        quoteContent = uniqueQuote.advice
+                                        quoteAuthor = ""
+                                    } else {
+                                        quoteContent = "No quotes found for '$keyword'"
+                                        quoteAuthor = ""
+                                    }
+                                } else {
+                                    quoteContent = "No quotes found for '$keyword'"
+                                    quoteAuthor = ""
+                                }
+                                return@launch
                             }
+
+                            // If we get here, there was no message and no slips
+                            quoteContent = "Unexpected response from API."
+                            quoteAuthor = ""
                         } else {
                             quoteContent = "Unexpected response from API."
                             quoteAuthor = ""
@@ -182,7 +245,10 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
                 MiddleLevelScreen(
                     tiles = middleLevelTiles.filter { it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme } },
                     onTileClick = { index ->
-                        val aspect = middleLevelTiles[index].title
+                        val filteredTiles = middleLevelTiles.filter {
+                            it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme }
+                        }
+                        val aspect = filteredTiles[index].title
                         fetchQuote(aspect)
                         navController.navigate(Screen.BottomLevel.createRoute(theme, aspect))
                     },
@@ -194,9 +260,13 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
             val theme = backStackEntry.arguments?.getString("theme")
             val aspect = backStackEntry.arguments?.getString("aspect")
             if (theme != null && aspect != null) {
+                val topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme }
+                val filteredTiles = middleLevelTiles.filter { it.topLevelIndex == topLevelIndex }
+                val middleLevelIndex = filteredTiles.indexOfFirst { it.title == aspect }
+
                 BottomLevelScreen(
-                    topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme },
-                    middleLevelIndex = middleLevelTiles.indexOfFirst { it.title == aspect },
+                    topLevelIndex = topLevelIndex,
+                    middleLevelIndex = middleLevelIndex,
                     quoteContent = quoteContent,
                     quoteAuthor = quoteAuthor,
                     onBack = { navController.popBackStack() }
@@ -296,7 +366,7 @@ fun MiddleLevelScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Middle Level - Top Level Index: ${tiles.first().topLevelIndex + 1}",
+            "Middle Level - Top Level Index: ${tiles.firstOrNull()?.topLevelIndex?.plus(1) ?: 0}",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(16.dp)
         )
