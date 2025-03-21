@@ -49,11 +49,6 @@ data class Quote(
     val advice: String
 )
 
-interface ZenQuotesApi {
-    @GET("api/random")
-    suspend fun getRandomQuote(): Response<List<ZenQuote>>
-}
-
 interface QuoteService {
     @GET("advice")
     suspend fun getQuote(): Response<Quote>
@@ -83,11 +78,6 @@ data class AdviceResponse(
 
 data class Message(
     val text: String
-)
-
-data class ZenQuote(
-    val q: String, // Quote text
-    val a: String // Author
 )
 
 // Object to store and manage quotes to avoid repetition
@@ -147,11 +137,10 @@ val middleLevelTiles = listOf(
 )
 
 val retrofit = Retrofit.Builder()
-    .baseUrl("https://zenquotes.io/")
+    .baseUrl("https://api.adviceslip.com/")
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-val zenQuotesApi: ZenQuotesApi = retrofit.create(ZenQuotesApi::class.java)
 val adviceService: AdviceService = retrofit.create(AdviceService::class.java)
 
 class MainActivity : ComponentActivity() {
@@ -185,22 +174,48 @@ fun TileApp() {
         val coroutineScope = rememberCoroutineScope()
 
         val fetchAdvice: (String) -> Unit = { keyword ->
+            val encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString())
             coroutineScope.launch {
                 try {
-                    val response = zenQuotesApi.getRandomQuote()
+                    val response = adviceService.searchAdvice(encodedKeyword)
                     if (response.isSuccessful) {
-                        val quotes = response.body()
-                        if (quotes != null && quotes.isNotEmpty()) {
-                            val quote = quotes[0]
-                            quoteContent = quote.q
-                            quoteAuthor = quote.a
+                        val adviceResponse = response.body()
+                        if (adviceResponse != null) {
+                            // Handle the case when message is provided
+                            adviceResponse.message?.let {
+                                quoteContent = it.text
+                                quoteAuthor = ""
+                                return@launch
+                            }
+
+                            // Handle slips when they exist
+                            adviceResponse.slips?.let { slips ->
+                                if (slips.isNotEmpty()) {
+                                    // Get a unique, non-repeating quote
+                                    val uniqueQuote = QuoteManager.getUniqueQuote(keyword, slips)
+                                    if (uniqueQuote != null) {
+                                        quoteContent = uniqueQuote.advice
+                                        quoteAuthor = ""
+                                    } else {
+                                        quoteContent = "No quotes found for '$keyword'"
+                                        quoteAuthor = ""
+                                    }
+                                } else {
+                                    quoteContent = "No quotes found for '$keyword'"
+                                    quoteAuthor = ""
+                                }
+                                return@launch
+                            }
+
+                            // If we get here, there was no message and no slips
+                            quoteContent = "Unexpected response from API."
+                            quoteAuthor = ""
                         } else {
-                            quoteContent = "Failed to fetch quote."
+                            quoteContent = "Unexpected response from API."
                             quoteAuthor = ""
                         }
                     } else {
-                        quoteContent = "Error: ${response.code()}"
-                        quoteAuthor = ""
+                        throw Exception("HTTP ${response.code()}")
                     }
                 } catch (e: Exception) {
                     Log.e("TileApp", "Error: ${e.message}")
