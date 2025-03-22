@@ -1,184 +1,633 @@
 [
   {
     "content": "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Love"]
   },
   {
     "content": "Until you make the unconscious conscious, it will direct your life and you will call it fate.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Self-Awareness"]
   },
   {
-    "content": "All conditioned things are impermanent’—when one sees this with wisdom, one turns away from suffering. This is the path to purification.",
-    "author": "Buddhist Philosophy"
+    "content": "All conditioned things are impermanent'—when one sees this with wisdom, one turns away from suffering. This is the path to purification.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Suffering"]
   },
   {
     "content": "You have power over your mind – not outside events. Realize this, and you will find strength.",
-    "author": "Marcus Aurelius"
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Mindfulness"]
   },
   {
     "content": "What you seek is seeking you.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Destiny"]
   },
   {
     "content": "Who looks outside, dreams; who looks inside, awakes.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Self-Reflection"]
   },
   {
     "content": "To live a pure unselfish life, one must count nothing as one's own in the midst of abundance.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Generosity"]
   },
   {
     "content": "Let no one ever come to you without leaving better and happier.",
-    "author": "Mother Teresa (Stoic ideals)"
+    "author": "Mother Teresa (Stoic ideals)",
+    "category": ["Stoicism", "Compassion"]
   },
   {
     "content": "The wound is the place where the Light enters you.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Healing"]
   },
   {
     "content": "The shoe that fits one person pinches another; there is no recipe for living that suits all cases.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Individuality"]
   },
   {
     "content": "Peace comes from within. Do not seek it without.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Peace"]
   },
   {
     "content": "The happiness of your life depends upon the quality of your thoughts.",
-    "author": "Marcus Aurelius"
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Mindfulness"]
   },
   {
     "content": "Let the beauty of what you love be what you do.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Passion"]
   },
   {
     "content": "Knowing your own darkness is the best method for dealing with the darknesses of other people.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Empathy"]
   },
   {
     "content": "Holding on to anger is like grasping a hot coal with the intent of throwing it at someone else; you are the one who gets burned.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Anger"]
   },
   {
     "content": "Waste no more time arguing what a good man should be. Be one.",
-    "author": "Marcus Aurelius"
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Action"]
   },
   {
     "content": "Yesterday I was clever, so I wanted to change the world. Today I am wise, so I am changing myself.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Wisdom"]
   },
   {
     "content": "We are not what happened to us, we are what we wish to become.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Transformation"]
   },
   {
     "content": "If you propose to speak always be sure it is an improvement on silence.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Silence"]
   },
   {
     "content": "Begin at once to live, and count each separate day as a separate life.",
-    "author": "Seneca"
+    "author": "Seneca",
+    "category": ["Stoicism", "Living"]
   },
   {
     "content": "Don't grieve. Anything you lose comes round in another form.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Change"]
   },
   {
     "content": "Your visions will become clear only when you can look into your own heart. Who looks outside, dreams; who looks inside, awakes.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Self-Reflection"]
   },
   {
     "content": "Three things cannot be long hidden: the sun, the moon, and the truth.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Truth"]
   },
   {
     "content": "We suffer more often in imagination than in reality.",
-    "author": "Seneca"
+    "author": "Seneca",
+    "category": ["Stoicism", "Imagination"]
   },
   {
-    "content": "You were born with potential. You were born with goodness and trust. You were born with ideals and dreams. You were born with greatness. You were born with wings. You are not meant for crawling, so don’t. You have wings. Learn to use them and fly.",
-    "author": "Rumi"
+    "content": "You were born with potential. You were born with goodness and trust. You were born with ideals and dreams. You were born with greatness. You were born with wings. You are not meant for crawling, so don't. You have wings. Learn to use them and fly.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Potential"]
   },
   {
     "content": "The privilege of a lifetime is being who you are.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Identity"]
   },
   {
     "content": "Just as a solid rock is unshaken by the storm, even so the wise are unshaken by praise or blame.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Wisdom"]
   },
   {
     "content": "It is not death that a man should fear, but he should fear never beginning to live.",
-    "author": "Marcus Aurelius"
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Living"]
   },
   {
     "content": "This is how I would die into the love I have for you: As pieces of cloud dissolve in sunlight.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Love", "Inspiration"]
   },
   {
     "content": "The meeting of two personalities is like the contact of two chemical substances: if there is any reaction, both are transformed.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Relationships"]
   },
   {
     "content": "Your purpose in life is to find your purpose and give your whole heart and soul to it.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Purpose"]
   },
   {
     "content": "How long are you going to wait before you demand the best for yourself?",
-    "author": "Epictetus"
+    "author": "Epictetus",
+    "category": ["Stoicism", "Self-Worth"]
   },
   {
     "content": "Ignore those that make you fearful and sad, that degrade you back towards disease and death.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Self-Preservation"]
   },
   {
     "content": "There is no coming to consciousness without pain.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Growth"]
   },
   {
     "content": "The root of suffering is attachment.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Suffering"]
   },
   {
     "content": "The chief task in life is simply this: to identify and separate matters so that I can say clearly to myself which are externals not under my control, and which have to do with the choices I actually control.",
-    "author": "Epictetus"
+    "author": "Epictetus",
+    "category": ["Stoicism", "Control"]
   },
   {
     "content": "Travel brings power and love back into your life.",
-    "author": "Rumi"
+    "author": "Rumi",
+    "category": ["Inspiration", "Travel"]
   },
   {
     "content": "I am not what happened to me, I am what I choose to become.",
-    "author": "Carl Jung"
+    "author": "Carl Jung",
+    "category": ["Psychology", "Transformation"]
   },
   {
     "content": "What we think, we become.",
-    "author": "Buddhist Philosophy"
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Mindfulness"]
   },
   {
-    "content": "If you are distressed by anything external, the pain is not due to the thing itself, but to your estimate of it; and this you have the power to revoke at any moment.",
-    "author": "Marcus Aurelius"
+    "content": "The soul becomes dyed with the colour of its thoughts.",
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Mindfulness"]
   },
   {
-    "content": "Everything that is made beautiful and fair and lovely is made for the eye of one who sees.",
-    "author": "Rumi"
+    "content": "You are searching for treasure outside, but the real treasure is inside you.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Self-Discovery"]
   },
   {
-    "content": "Often the hands will solve a mystery that the intellect has struggled with in vain.",
-    "author": "Carl Jung"
+    "content": "In all chaos there is a cosmos, in all disorder a secret order.",
+    "author": "Carl Jung",
+    "category": ["Psychology", "Order"]
   },
   {
-    "content": "If you light a lamp for somebody, it will also brighten your path.",
-    "author": "Buddhist Philosophy"
+    "content": "The greatest wealth is contentment with little, for there is never want for those who are content.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Contentment"]
   },
   {
-    "content": "First say to yourself what you would be; and then do what you have to do.",
-    "author": "Epictetus"
+    "content": "To live happily is an inward power of the soul.",
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Happiness"]
   },
   {
-    "content": "Let yourself be silently drawn by the stronger pull of what you really love.",
-    "author": "Rumi"
+    "content": "Let go of your mind and then be mindful. Close your ears and listen.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Mindfulness"]
   },
   {
-    "content": "The greatest and most important problems of life are all in a certain sense insoluble.",
-    "author": "Carl Jung,
+    "content": "The shadow is a living part of the personality and therefore wants to live with it in some form. It cannot be argued with - it has to be lived with.",
+    "author": "Carl Jung",
+    "category": ["Psychology", "Shadow Self"]
+  },
+  {
+    "content": "If you let go a little, you will have a little peace. If you let go a lot, you will have a lot of peace.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Peace"]
+  },
+  {
+    "content": "The best revenge is to be unlike him who performed the injury.",
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Forgiveness"]
+  },
+  {
+    "content": "What hurts you, blesses you. Darkness is your candle.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Transformation"]
+  },
+  {
+    "content": "A dream is a theater where the dreamer is at once scene, player, prompter, stage manager, author, audience, and critic.",
+    "author": "Carl Jung",
+    "category": ["Psychology", "Dreams"]
+  },
+  {
+    "content": "Better than a meaningless word is a meaningful sentence, if one hears it and understands.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Communication"]
+  },
+  {
+    "content": "No person has the power to have everything they want, but it is in their power not to want what they don't have, and to cheerfully put to good use what they do have.",
+    "author": "Seneca",
+    "category": ["Stoicism", "Gratitude"]
+  },
+  {
+    "content": "Lovers don't finally meet somewhere. They're in each other all along.",
+    "author": "Rumi",
+    "category": ["Love", "Connection"]
+  },
+  {
+    "content": "The most terrifying thing is to accept oneself completely.",
+    "author": "Carl Jung",
+    "category": ["Psychology", "Self-Acceptance"]
+  },
+  {
+    "content": "Whatever words we utter should be chosen with care for people will hear them and be influenced by them for good or ill.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Communication"]
+  },
+  {
+    "content": "The object of life is not to be on the side of the majority, but to escape finding oneself amongst the insane.",
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Individuality"]
+  },
+  {
+    "content": "Let the lover be disgraceful, crazy, absentminded. Someone sober will worry about events later, let the lover be insane.",
+    "author": "Rumi",
+    "category": ["Love", "Passion"]
+  },
+  {
+    "content": "To conquer oneself is a greater task than conquering others.",
+    "author": "Buddhist Philosophy",
+    "category": ["Philosophy", "Self-Discipline"]
+  },
+  {
+    "content": "If you seek tranquillity, do less.",
+    "author": "Marcus Aurelius",
+    "category": ["Stoicism", "Tranquility"]
+  },
+  {
+    "content": "Let yourself be silently drawn by the strange pull of what you really love. It will not lead you astray.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Passion"]
+  },
+  {
+    "content": "You were born with wings, why prefer to crawl through life?",
+    "author": "Rumi",
+    "category": ["Inspiration", "Potential"]
+  },
+  {
+    "content": "When the soul lies down in that grass, the world is too full to talk about ideas, language, even the phrase each other doesn't make any sense.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Connection"]
+  },
+  {
+    "content": "Raise your words, not voice. It is rain that grows flowers, not thunder.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Kindness"]
+  },
+  {
+    "content": "Try not to resist the changes that come your way. Instead, let life live through you. And do not worry that your life is turning upside down. How do you know that the side you are used to is better than the one to come?",
+    "author": "Rumi",
+    "category": ["Inspiration", "Change"]
+  },
+  {
+    "content": "Do not feel lonely, the entire universe is inside you.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Connection"]
+  },
+  {
+    "content": "The moment you accept what troubles you've been given, the door will open.",
+    "author": "Rumi",
+    "category": ["Inspiration", "Acceptance"]
+  },
+  {
+    "content": "Happiness is not the absence of problems, it's the ability to deal with them.",
+    "author": "Steve Maraboli",
+    "category": ["Happiness", "Resilience"]
+  },
+  {
+    "content": "The purpose of our lives is to be happy.",
+    "author": "Dalai Lama",
+    "category": ["Happiness", "Purpose"]
+  },
+  {
+    "content": "Happiness is when what you think, what you say, and what you do are in harmony.",
+    "author": "Mahatma Gandhi",
+    "category": ["Happiness", "Integrity"]
+  },
+  {
+    "content": "The greatest motivation you can give yourself is to enjoy what you do.",
+    "author": "Anonymous",
+    "category": ["Motivation", "Enjoyment"]
+  },
+  {
+    "content": "Your limitation—it's only your imagination.",
+    "author": "Anonymous",
+    "category": ["Motivation", "Potential"]
+  },
+  {
+    "content": "Push yourself, because no one else is going to do it for you.",
+    "author": "Anonymous",
+    "category": ["Motivation", "Self-Discipline"]
+  },
+  {
+    "content": "Sometimes later becomes never. Do it now.",
+    "author": "Anonymous",
+    "category": ["Motivation", "Action"]
+  },
+  {
+    "content": "Great things never come from comfort zones.",
+    "author": "Anonymous",
+    "category": ["Motivation", "Growth"]
+  },
+
+
+
+
+    {
+      "content": "The impediment to action advances action. What stands in the way becomes the way.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Motivation"]
+    },
+    {
+      "content": "Happiness is not something ready-made. It comes from your own actions.",
+      "author": "Dalai Lama",
+      "category": ["Happiness", "Action"]
+    },
+    {
+      "content": "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+      "author": "Aristotle",
+      "category": ["Philosophy", "Excellence"]
+    },
+    {
+      "content": "The greatest glory in living lies not in never falling, but in rising every time we fall.",
+      "author": "Nelson Mandela",
+      "category": ["Inspiration", "Resilience"]
+    },
+    {
+      "content": "The present moment is filled with joy and happiness. If you are attentive, you will see it.",
+      "author": "Thich Nhat Hanh",
+      "category": ["Mindfulness", "Happiness"]
+    },
+    {
+      "content": "The best way out is always through.",
+      "author": "Robert Frost",
+      "category": ["Motivation", "Resilience"]
+    },
+    {
+      "content": "We must be willing to let go of the life we planned so as to have the life that is waiting for us.",
+      "author": "Joseph Campbell",
+      "category": ["Inspiration", "Change"]
+    },
+    {
+      "content": "It is not the mountain we conquer, but ourselves.",
+      "author": "Edmund Hillary",
+      "category": ["Motivation", "Self-Discipline"]
+    },
+    {
+      "content": "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it.",
+      "author": "Rumi",
+      "category": ["Inspiration", "Love"]
+    },
+    {
+      "content": "The meaning of life is to find your gift. The purpose of life is to give it away.",
+      "author": "Pablo Picasso",
+      "category": ["Inspiration", "Purpose"]
+    },
+    {
+      "content": "Everything can be taken from a man but one thing: the last of the human freedoms—to choose one's attitude in any given set of circumstances.",
+      "author": "Viktor Frankl",
+      "category": ["Philosophy", "Freedom"]
+    },
+    {
+      "content": "The way to get started is to quit talking and begin doing.",
+      "author": "Walt Disney",
+      "category": ["Motivation", "Action"]
+    },
+    {
+      "content": "The two most important days in your life are the day you are born and the day you find out why.",
+      "author": "Mark Twain",
+      "category": ["Inspiration", "Purpose"]
+    },
+    {
+      "content": "When you realize there is nothing lacking, the whole world belongs to you.",
+      "author": "Lao Tzu",
+      "category": ["Philosophy", "Contentment"]
+    },
+    {
+      "content": "Do not seek to follow in the footsteps of the wise. Seek what they sought.",
+      "author": "Matsuo Basho",
+      "category": ["Philosophy", "Wisdom"]
+    },
+    {
+      "content": "External things are not the problem. It's your assessment of them. Which you can erase right now.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Perception"]
+    },
+    {
+      "content": "Be content with what you have; rejoice in the way things are. When you realize there is nothing lacking, the whole world belongs to you.",
+      "author": "Lao Tzu",
+      "category": ["Philosophy", "Happiness"]
+    },
+    {
+      "content": "The more you are motivated by love, the more fearless and free your action will be.",
+      "author": "Dalai Lama",
+      "category": ["Inspiration", "Love"]
+    },
+    {
+      "content": "Life shrinks or expands in proportion to one's courage.",
+      "author": "Anaïs Nin",
+      "category": ["Motivation", "Courage"]
+    },
+    {
+      "content": "Every worthy act is difficult. Ascent is always difficult. Descent is easy and often slippery.",
+      "author": "Mahatma Gandhi",
+      "category": ["Motivation", "Persistence"]
+    },
+    {
+      "content": "The happiness of your life depends upon the quality of your thoughts.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Happiness"]
+    },
+    {
+      "content": "I have been impressed with the urgency of doing. Knowing is not enough; we must apply. Being willing is not enough; we must do.",
+      "author": "Leonardo da Vinci",
+      "category": ["Motivation", "Action"]
+    },
+    {
+      "content": "The only limits you see are the ones you impose on yourself.",
+      "author": "Dr. Wayne Dyer",
+      "category": ["Inspiration", "Potential"]
+    },
+    {
+      "content": "What you seek is seeking you.",
+      "author": "Rumi",
+      "category": ["Inspiration", "Connection"]
+    },
+    {
+      "content": "The wound is the place where the Light enters you.",
+      "author": "Rumi",
+      "category": ["Inspiration", "Growth"]
+    },
+    {
+      "content": "It is the mark of an educated mind to be able to entertain a thought without accepting it.",
+      "author": "Aristotle",
+      "category": ["Philosophy", "Wisdom"]
+    },
+    {
+      "content": "The unexamined life is not worth living.",
+      "author": "Socrates",
+      "category": ["Philosophy", "Self-Awareness"]
+    },
+    {
+      "content": "Waste no more time arguing about what a good man should be. Be one.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Action"]
+    },
+    {
+      "content": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+      "author": "Winston Churchill",
+      "category": ["Motivation", "Resilience"]
+    },
+    {
+      "content": "The only true wisdom is in knowing you know nothing.",
+      "author": "Socrates",
+      "category": ["Philosophy", "Humility"]
+    },
+    {
+      "content": "You do not rise to the level of your goals. You fall to the level of your systems.",
+      "author": "James Clear",
+      "category": ["Motivation", "Habits"]
+    },
+    {
+      "content": "Those who cannot change their minds cannot change anything.",
+      "author": "George Bernard Shaw",
+      "category": ["Inspiration", "Change"]
+    },
+    {
+      "content": "Begin at once to live, and count each separate day as a separate life.",
+      "author": "Seneca",
+      "category": ["Stoicism", "Presence"]
+    },
+    {
+      "content": "The quieter you become, the more you can hear.",
+      "author": "Ram Dass",
+      "category": ["Mindfulness", "Wisdom"]
+    },
+    {
+      "content": "The only way to do great work is to love what you do.",
+      "author": "Steve Jobs",
+      "category": ["Motivation", "Passion"]
+    },
+    {
+      "content": "Happiness is when what you think, what you say, and what you do are in harmony.",
+      "author": "Mahatma Gandhi",
+      "category": ["Happiness", "Integrity"]
+    },
+    {
+      "content": "I cannot teach anybody anything. I can only make them think.",
+      "author": "Socrates",
+      "category": ["Philosophy", "Teaching"]
+    },
+    {
+      "content": "A man who fears suffering is already suffering from what he fears.",
+      "author": "Michel de Montaigne",
+      "category": ["Philosophy", "Fear"]
+    },
+    {
+      "content": "The soul becomes dyed with the color of its thoughts.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Mindfulness"]
+    },
+    {
+      "content": "When one door of happiness closes, another opens; but often we look so long at the closed door that we do not see the one which has been opened for us.",
+      "author": "Helen Keller",
+      "category": ["Happiness", "Perspective"]
+    },
+    {
+      "content": "We are not given a good life or a bad life. We are given a life. It's up to us to make it good or bad.",
+      "author": "Ward Foley",
+      "category": ["Inspiration", "Perspective"]
+    },
+    {
+      "content": "Real knowledge is to know the extent of one's ignorance.",
+      "author": "Confucius",
+      "category": ["Philosophy", "Wisdom"]
+    },
+    {
+      "content": "If we are facing in the right direction, all we have to do is keep on walking.",
+      "author": "Buddhist Proverb",
+      "category": ["Motivation", "Direction"]
+    },
+    {
+      "content": "In the middle of difficulty lies opportunity.",
+      "author": "Albert Einstein",
+      "category": ["Motivation", "Opportunity"]
+    },
+    {
+      "content": "Out beyond ideas of wrongdoing and rightdoing, there is a field. I'll meet you there.",
+      "author": "Rumi",
+      "category": ["Inspiration", "Connection"]
+    },
+    {
+      "content": "True wisdom comes to each of us when we realize how little we understand about life, ourselves, and the world around us.",
+      "author": "Socrates",
+      "category": ["Philosophy", "Humility"]
+    },
+    {
+      "content": "The cave you fear to enter holds the treasure you seek.",
+      "author": "Joseph Campbell",
+      "category": ["Motivation", "Courage"]
+    },
+    {
+      "content": "The world is a book and those who do not travel read only one page.",
+      "author": "St. Augustine",
+      "category": ["Inspiration", "Growth"]
+    },
+    {
+      "content": "Don't grieve. Anything you lose comes round in another form.",
+      "author": "Rumi",
+      "category": ["Inspiration", "Change"]
+    },
+    {
+      "content": "The key to growth is the introduction of higher dimensions of consciousness into our awareness.",
+      "author": "Lao Tzu",
+      "category": ["Philosophy", "Growth"]
+    },
+    {
+      "content": "You have power over your mind – not outside events. Realize this, and you will find strength.",
+      "author": "Marcus Aurelius",
+      "category": ["Stoicism", "Strength"]
+    }
+  ]
+
+
