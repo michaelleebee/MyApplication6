@@ -12,7 +12,7 @@ android {
         applicationId = "com.example.myapplication"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
+        versionCode = 19
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -80,4 +80,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}}
+    implementation("org.jsoup:jsoup:1.15.3")
+  }
+}

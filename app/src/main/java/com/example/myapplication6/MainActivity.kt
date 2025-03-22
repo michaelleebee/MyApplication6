@@ -1,6 +1,7 @@
 package com.example.myapplication6
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -14,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -23,16 +22,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Query
-import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-import kotlin.random.Random
+import java.io.IOException
 
 sealed class Screen(val route: String) {
     object TopLevel : Screen("top_level")
@@ -45,103 +37,94 @@ sealed class Screen(val route: String) {
 }
 
 data class Quote(
-    val id: Int,
-    val advice: String
+    val content: String,
+    val author: String,
+    val category: List<String>,
+    val length: Int
 )
 
-interface QuoteService {
-    @GET("advice")
-    suspend fun getQuote(): Response<Quote>
-}
-
-interface AdviceService {
-    @GET("advice/search/{keyword}")
-    suspend fun searchAdvice(@Path("keyword") keyword: String): Response<AdviceResponse>
-}
-
-data class ErrorResponse(val message: String)
-data class TopLevelTile(val title: String)
-data class MiddleLevelTile(val title: String, val topLevelIndex: Int)
-data class Slip(
-    val id: Int,
-    val advice: String
-)
-
-data class QuoteResponse(
-    val slip: Slip?
-)
-
-data class AdviceResponse(
-    val slips: List<Slip>?,
-    val message: Message?
-)
-
-data class Message(
-    val text: String
-)
-
-// Object to store and manage quotes to avoid repetition
 object QuoteManager {
-    // Map to store used quotes for each keyword
-    private val usedQuotesMap = mutableMapOf<String, MutableSet<Int>>()
+    private var quotes: List<Quote> = emptyList()
+    private val usedQuotes = mutableMapOf<String, MutableSet<Int>>()
 
-    // Function to get a non-repeating quote
-    fun getUniqueQuote(keyword: String, quotes: List<Slip>): Slip? {
-        if (quotes.isEmpty()) return null
+    fun initialize(context: Context) {
+        try {
+            val jsonString = context.assets.open("quotes.json").bufferedReader().use { it.readText() }
+            val listType = object : TypeToken<List<Quote>>() {}.type
+            quotes = Gson().fromJson(jsonString, listType)
+            Log.d("QuoteManager", "Initialized with ${quotes.size} quotes")
+        } catch (e: IOException) {
+            Log.e("QuoteManager", "Error initializing QuoteManager: ${e.message}")
+            quotes = emptyList()
+        }
+    }
 
-        // Initialize the set of used quotes for this keyword if not already present
-        if (!usedQuotesMap.containsKey(keyword)) {
-            usedQuotesMap[keyword] = mutableSetOf()
+    fun getRandomQuote(category: String? = null): Quote? {
+        if (quotes.isEmpty()) {
+            Log.w("QuoteManager", "No quotes loaded. Make sure QuoteManager.initialize() is called.")
+            return null
         }
 
-        val usedQuotes = usedQuotesMap[keyword]!!
-
-        // If all quotes have been used, reset the set
-        if (usedQuotes.size >= quotes.size) {
-            usedQuotes.clear()
+        val filteredQuotes = if (category != null) {
+            quotes.filter { it.category.any { cat -> cat.equals(category, ignoreCase = true) } }
+        } else {
+            quotes
         }
 
-        // Find quotes that haven't been used yet
-        val availableQuotes = quotes.filter { it.id !in usedQuotes }
-
-        // If no quotes are available (should never happen due to the reset above)
-        if (availableQuotes.isEmpty()) {
-            // Reset and try again with all quotes
-            usedQuotes.clear()
-            return quotes.random().also { usedQuotes.add(it.id) }
+        if (filteredQuotes.isEmpty()) {
+            Log.w("QuoteManager", "No quotes found for category: $category")
+            return null
         }
 
-        // Get a random quote from available ones
-        val selectedQuote = availableQuotes.random()
+        val categoryKey = category ?: "all"
+        if (!usedQuotes.containsKey(categoryKey)) {
+            usedQuotes[categoryKey] = mutableSetOf()
+        }
 
-        // Mark this quote as used
-        usedQuotes.add(selectedQuote.id)
+        val usedQuoteIndices = usedQuotes[categoryKey]!!
 
+        if (usedQuoteIndices.size >= filteredQuotes.size) {
+            usedQuoteIndices.clear()
+            Log.d("QuoteManager", "Reset used quotes for category: $categoryKey")
+        }
+
+        val availableIndices = filteredQuotes.indices.filter { it !in usedQuoteIndices }
+
+        if (availableIndices.isEmpty()) {
+            Log.w("QuoteManager", "All quotes used for category: $categoryKey.  Resetting...")
+            usedQuoteIndices.clear()
+            return filteredQuotes.random()
+        }
+
+        val randomIndex = availableIndices.random()
+        val selectedQuote = filteredQuotes[randomIndex]
+        usedQuoteIndices.add(randomIndex)
+
+        Log.d("QuoteManager", "Returning quote for category: $categoryKey. Used quote count: ${usedQuoteIndices.size}")
         return selectedQuote
     }
 }
 
 val topLevelTiles = listOf(
-    TopLevelTile("Inspiration"),
-    TopLevelTile("Motivation"),
-    TopLevelTile("Happiness")
+    TopLevelTile("Rumi"),
+    TopLevelTile("Jung"),
+    TopLevelTile("Buddhism"),
+    TopLevelTile("Stoicism")
 )
 
 val middleLevelTiles = listOf(
     MiddleLevelTile("Love", 0),
     MiddleLevelTile("Life", 0),
-    MiddleLevelTile("Success", 1),
-    MiddleLevelTile("Goals", 1),
-    MiddleLevelTile("Joy", 2),
-    MiddleLevelTile("Peace", 2)
+    MiddleLevelTile("Self", 1),
+    MiddleLevelTile("Shadow", 1),
+    MiddleLevelTile("Mindfulness", 2),
+    MiddleLevelTile("Compassion", 2),
+    MiddleLevelTile("Virtue", 3),
+    MiddleLevelTile("Resilience", 3)
 )
 
-val retrofit = Retrofit.Builder()
-    .baseUrl("https://api.adviceslip.com/")
-    .addConverterFactory(GsonConverterFactory.create())
-    .build()
-
-val adviceService: AdviceService = retrofit.create(AdviceService::class.java)
+data class TopLevelTile(val title: String)
+data class MiddleLevelTile(val title: String, val topLevelIndex: Int)
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -150,6 +133,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        QuoteManager.initialize(this)
         setContent {
             TileApp()
         }
@@ -158,7 +142,8 @@ class MainActivity : ComponentActivity() {
             this,
             arrayOf(
                 Manifest.permission.CHANGE_WIFI_STATE,
-                Manifest.permission.ACCESS_WIFI_STATE
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.INTERNET
             ),
             REQUEST_CODE_WIFI_PERMISSIONS
         )
@@ -173,59 +158,20 @@ fun TileApp() {
 
         val coroutineScope = rememberCoroutineScope()
 
-        val fetchAdvice: (String) -> Unit = { keyword ->
-            val encodedKeyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8.toString())
+        val fetchQuotes: (String) -> Unit = { keyword ->
             coroutineScope.launch {
-                try {
-                    val response = adviceService.searchAdvice(encodedKeyword)
-                    if (response.isSuccessful) {
-                        val adviceResponse = response.body()
-                        if (adviceResponse != null) {
-                            // Handle the case when message is provided
-                            adviceResponse.message?.let {
-                                quoteContent = it.text
-                                quoteAuthor = ""
-                                return@launch
-                            }
-
-                            // Handle slips when they exist
-                            adviceResponse.slips?.let { slips ->
-                                if (slips.isNotEmpty()) {
-                                    // Get a unique, non-repeating quote
-                                    val uniqueQuote = QuoteManager.getUniqueQuote(keyword, slips)
-                                    if (uniqueQuote != null) {
-                                        quoteContent = uniqueQuote.advice
-                                        quoteAuthor = ""
-                                    } else {
-                                        quoteContent = "No quotes found for '$keyword'"
-                                        quoteAuthor = ""
-                                    }
-                                } else {
-                                    quoteContent = "No quotes found for '$keyword'"
-                                    quoteAuthor = ""
-                                }
-                                return@launch
-                            }
-
-                            // If we get here, there was no message and no slips
-                            quoteContent = "Unexpected response from API."
-                            quoteAuthor = ""
-                        } else {
-                            quoteContent = "Unexpected response from API."
-                            quoteAuthor = ""
-                        }
-                    } else {
-                        throw Exception("HTTP ${response.code()}")
-                    }
-                } catch (e: Exception) {
-                    Log.e("TileApp", "Error: ${e.message}")
-                    quoteContent = "Error: ${e.message}"
+                val quote = QuoteManager.getRandomQuote(keyword)
+                if (quote != null) {
+                    quoteContent = quote.content
+                    quoteAuthor = quote.author
+                } else {
+                    quoteContent = "No quotes found for '$keyword'"
                     quoteAuthor = ""
                 }
             }
         }
 
-        AppNavigation(quoteContent, quoteAuthor, fetchAdvice)
+        AppNavigation(quoteContent, quoteAuthor, fetchQuotes)
     }
 }
 
@@ -234,44 +180,55 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
     val navController = rememberNavController()
     NavHost(navController, startDestination = Screen.TopLevel.route) {
         composable(Screen.TopLevel.route) {
-            TopLevelScreen(tiles = topLevelTiles, onTileClick = { index ->
-                val theme = topLevelTiles[index].title
-                navController.navigate(Screen.MiddleLevel.createRoute(theme))
-            })
+            TopLevelScreen(
+                tiles = topLevelTiles,
+                onTileClick = { index ->
+                    val theme = topLevelTiles[index].title
+                    navController.navigate(Screen.MiddleLevel.createRoute(theme))
+                },
+                quoteContent = quoteContent,
+                quoteAuthor = quoteAuthor
+            )
         }
         composable(Screen.MiddleLevel.route) { backStackEntry ->
-            val theme = backStackEntry.arguments?.getString("theme")
-            if (theme != null) {
-                MiddleLevelScreen(
-                    tiles = middleLevelTiles.filter { it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme } },
-                    onTileClick = { index ->
-                        val filteredTiles = middleLevelTiles.filter {
-                            it.topLevelIndex == topLevelTiles.indexOfFirst { tile -> tile.title == theme }
-                        }
-                        val aspect = filteredTiles[index].title
-                        fetchQuote(aspect)
-                        navController.navigate(Screen.BottomLevel.createRoute(theme, aspect))
-                    },
-                    onBack = { navController.popBackStack() }
-                )
+            val theme = backStackEntry.arguments?.getString("theme") ?: ""
+
+            val topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme }
+            val filteredTiles = middleLevelTiles.filter { it.topLevelIndex == topLevelIndex }
+
+            LaunchedEffect(theme) {
+                fetchQuote(theme)
             }
+
+            MiddleLevelScreen(
+                tiles = filteredTiles,
+                onTileClick = { index ->
+                    val aspect = filteredTiles[index].title
+                    navController.navigate(Screen.BottomLevel.createRoute(theme, aspect))
+                },
+                onBack = { navController.popBackStack() },
+                fetchQuote = fetchQuote
+            )
         }
         composable(Screen.BottomLevel.route) { backStackEntry ->
-            val theme = backStackEntry.arguments?.getString("theme")
-            val aspect = backStackEntry.arguments?.getString("aspect")
-            if (theme != null && aspect != null) {
-                val topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme }
-                val filteredTiles = middleLevelTiles.filter { it.topLevelIndex == topLevelIndex }
-                val middleLevelIndex = filteredTiles.indexOfFirst { it.title == aspect }
+            val theme = backStackEntry.arguments?.getString("theme") ?: ""
+            val aspect = backStackEntry.arguments?.getString("aspect") ?: ""
 
-                BottomLevelScreen(
-                    topLevelIndex = topLevelIndex,
-                    middleLevelIndex = middleLevelIndex,
-                    quoteContent = quoteContent,
-                    quoteAuthor = quoteAuthor,
-                    onBack = { navController.popBackStack() }
-                )
+            LaunchedEffect(aspect) {
+                fetchQuote(aspect)
             }
+
+            val topLevelIndex = topLevelTiles.indexOfFirst { it.title == theme }
+            val filteredTiles = middleLevelTiles.filter { it.topLevelIndex == topLevelIndex }
+            val middleLevelIndex = filteredTiles.indexOfFirst { it.title == aspect }
+
+            BottomLevelScreen(
+                topLevelIndex = topLevelIndex,
+                middleLevelIndex = middleLevelIndex,
+                quoteContent = quoteContent,
+                quoteAuthor = quoteAuthor,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }
@@ -280,7 +237,6 @@ fun AppNavigation(quoteContent: String, quoteAuthor: String, fetchQuote: (String
 fun TileButton(
     text: String,
     onClick: () -> Unit,
-    fontSize: TextUnit = 20.sp,
     tileColor: Color = MaterialTheme.colorScheme.primary
 ) {
     Button(
@@ -290,12 +246,47 @@ fun TileButton(
             .height(50.dp),
         colors = ButtonDefaults.buttonColors(containerColor = tileColor)
     ) {
-        Text(text = text, fontSize = fontSize)
+        Text(text = text, fontSize = 20.sp)
     }
 }
 
 @Composable
-fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
+fun QuoteCard(quote: Quote) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = quote.content,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            if (quote.author.isNotEmpty()) {
+                Text(
+                    text = "- ${quote.author}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.End)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TopLevelScreen(
+    tiles: List<TopLevelTile>,
+    onTileClick: (Int) -> Unit,
+    quoteContent: String,
+    quoteAuthor: String
+) {
+    val quote = Quote(quoteContent, quoteAuthor, emptyList(), 0)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -312,7 +303,7 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(300.dp)
                 .padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -320,25 +311,11 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
                 painter = painterResource(id = R.drawable.your_resized_elephant_image),
                 contentDescription = "Top Level Image",
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.size(200.dp)
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Do not dwell in the past, do not dream of the future,",
-                fontSize = 32.sp
-            )
-            Text(
-                text = "concentrate the mind on the present moment.",
-                fontSize = 32.sp
-            )
-        }
+        QuoteCard(quote = quote)
 
         Column(
             modifier = Modifier
@@ -358,28 +335,28 @@ fun TopLevelScreen(tiles: List<TopLevelTile>, onTileClick: (Int) -> Unit) {
 fun MiddleLevelScreen(
     tiles: List<MiddleLevelTile>,
     onTileClick: (Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    fetchQuote: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            "Middle Level - Top Level Index: ${tiles.firstOrNull()?.topLevelIndex?.plus(1) ?: 0}",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        tiles.forEachIndexed { index, tile ->
-            TileButton(
-                text = tile.title,
-                onClick = { onTileClick(index) })
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
         Button(onClick = onBack) {
-            Text("Back to Inspiration: Home")
+            Text("Go Back")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        tiles.forEachIndexed { index, tile ->
+            TileButton(text = tile.title, onClick = {
+                fetchQuote(tile.title)
+                onTileClick(index)
+            })
+        }
+        LaunchedEffect(key1 = tiles) {
+            if (tiles.isNotEmpty()) {
+                fetchQuote(tiles.first().title)
+            }
         }
     }
 }
@@ -392,6 +369,8 @@ fun BottomLevelScreen(
     quoteAuthor: String,
     onBack: () -> Unit
 ) {
+    val quote = Quote(quoteContent, quoteAuthor, emptyList(), 0)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -405,29 +384,7 @@ fun BottomLevelScreen(
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = quoteContent,
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-                if (quoteAuthor.isNotEmpty()) {
-                    Text(
-                        text = "— $quoteAuthor",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.align(Alignment.End)
-                    )
-                }
-            }
-        }
+        QuoteCard(quote = quote)
 
         Button(
             onClick = onBack,
@@ -435,19 +392,5 @@ fun BottomLevelScreen(
         ) {
             Text("Back to Middle Level")
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    TileApp()
-}
-
-@Preview
-@Composable
-fun TileButtonPreview() {
-    MaterialTheme {
-        TileButton(text = "Test Button", onClick = {})
     }
 }
